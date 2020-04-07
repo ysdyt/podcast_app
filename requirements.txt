@@ -1,0 +1,6 @@
+###### Requirements for wordcloud ######
+mecab
+mecab-ipadic
+swing
+mecab-python3
+
