@@ -1,11 +1,13 @@
-import MeCab
+import os
 import re
+import sys
+import pickle
 from collections import Counter
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
-import pickle
-import sys
-import os
+from sudachipy import tokenizer
+from sudachipy import dictionary
+
 
 args = sys.argv
 file_name = args[1]
@@ -14,18 +16,18 @@ file_b_name = os.path.splitext(args[1])[0]
 with open('./transcribed_file/{}'.format(file_name), 'rb') as f:
     transcribed_result = pickle.load(f)
 
-# mecab
-mecab = MeCab.Tagger ('-d /usr/local/lib/mecab/dic/mecab-ipadic-neologd')
-node = mecab.parseToNode(transcribed_result['results']['transcripts'][0]['transcript'].replace(' ', ''))
+full_script = transcribed_result['results']['transcripts'][0]['transcript'].replace(' ', '')
+
+# Sudachi
+tokenizer_obj = dictionary.Dictionary().create()
+mode = tokenizer.Tokenizer.SplitMode.C
+
+target_word_list = []
 target_part = ('名詞')
-word = []
 
-while node:
-    if node.feature.split(",")[0] in target_part:
-        word.append(node.surface)
-    node = node.next
+target_word_list = [m.surface() for m in tokenizer_obj.tokenize(full_script, mode) if m.part_of_speech()[0] in target_part]
 
-word_freq_dict = Counter(word)
+word_freq_dict = Counter(target_word_list)
 stop_words = ['音', '化', '井上', 'お願い', 'こと', '今日', 'それ', 'ところ', 'みたい', '話','的','人','何','自分','方','感じ','みんな','私','僕','今','時',
               '中','後','気','番','誰','風','結局', '技術','確か','そうそう','前','白金','鉱業','工業','最近','他','一番','好き','名前','データ','データサイエンティスト',
               '会社','分析','会','回','人たち','ブレインパッド','毎回','逆','内容','俺','じゃなくて','住所','人','一','あなた','データサイエンス', '一緒', '吉田', '十',
