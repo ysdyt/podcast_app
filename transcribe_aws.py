@@ -1,7 +1,7 @@
 import time
 import boto3
 import datetime
-import re 
+import re
 import requests
 import json
 import pickle
